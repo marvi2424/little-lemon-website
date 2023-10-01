@@ -16,6 +16,7 @@ This repository contains the source code for a restaurant website built using Dj
 
 ### Booking Page
 - The `book` view allows users to make reservations by submitting a booking form. Users can input details such as their name, reservation date, reservation hour, phone number, and the number of guests.
+  **Note:** The phone number input in the booking form is automatically formatted using JavaScript code to enhance the user experience. When users enter their phone number, it will be displayed in the format (XXX) XXX - XXXX.
 
    ![Booking Page](screenshots/book.jpeg)
 
@@ -35,4 +36,6 @@ This repository contains the source code for a restaurant website built using Dj
   - The API checks for existing reservations and validates the input data.
   - It provides information about the availability of reservations for a specified date, including the number of reservations per hour and maximum capacity constraints.
 
+## Database
 
+This project uses a MySQL database for data storage.
