@@ -1,19 +1,33 @@
 {% extends 'base.html' %}
 {% load static %}
 {% block content %}
-<h1>Menu</h1>
-<!--Begin col-->
-<div class="column">
+<h1 style="text-align: center;">Menu</h1>
+<!--Begin row-->
+<div class="row">
+
     {% for item in menu.menu %}
-    <p>
-        <a href="{% url 'menu_item' pk=item.pk %}">
-            {{ item.name }}
+    <div class="column">
+        <p id="menu-item"
+            style="background-image: linear-gradient(0deg, rgba(0, 0, 0, 0.3), rgba(0, 0, 0, 0.8)), url('{{ item.image.url }}'); background-size: cover; background-position: 75%; color: white; min-height: 200px; text-align: center;">
+            <a href="{% url 'menu_item' pk=item.pk %}">
+                {{ item.name }}
             </a>
-        <span class="menu-price">
-            ${{ item.price }}.00
-        </span>
-    </p>
+            <span class="menu-price">
+                ${{ item.price }}.00
+            </span>
+        </p>
+    </div>
     {% endfor %}
+
+
+    <!-- <div class="column">
+    <article>
+        <figure class="figure">
+            <img src="{% static 'img/mario-and-adrian.jpg' %}" alt="Mario and Adrian" />
+
+        </figure>
+    </article>
+</div> -->
 </div>
-<!--End col-->
+<!--End row-->
 {% endblock %}

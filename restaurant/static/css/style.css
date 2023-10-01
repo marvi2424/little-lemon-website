@@ -22,6 +22,7 @@ h1 {
     font-size: 4rem;
     margin-top: 1.5rem;
     margin-bottom: 0;
+
 }
 
 h2 {
@@ -276,4 +277,23 @@ footer p {
     display: flex !important;
     gap: 10px !important;
     /* Adjust the gap as needed */
+}
+
+/* styles.css */
+
+.image-container img {
+    display: block;
+    margin-left: auto;
+    margin-right: auto;
+    max-width: 100%;
+    height: auto;
+}
+
+#menu-item {
+    background-size: cover;
+    background-position: 75%;
+    color: white;
+    min-height: 200px;
+    text-align: center;
+    ;
 }
