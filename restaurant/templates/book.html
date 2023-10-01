@@ -1,0 +1,179 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block content %}
+<section>
+  <article>
+    <h1>Make a reservation</h1>
+    <!--Begin row-->
+    <div class="row" id="row">
+      <!--Begin col-->
+      <div class="column">
+        {% csrf_token %}
+        <form method="POST" id="form">
+
+          <p>
+            <label for="first_name">Name:</label>
+            <input type="text" placeholder="Your Name" maxlength="50" id="first_name" autocomplete="off">
+          </p>
+          <p>
+            <label for="phone_number">Phone Number</label>
+            <input type="tel" id="phone_number" name="phone_number" autocomplete="off" placeholder="(111) 111-1111">
+          </p>
+          <p>
+
+            <label for="reservation_date">Reservation date: </label>
+            <input type="date" id="reservation_date">
+          </p>
+
+
+          <p>
+            <label for="reservation_hour">Reservation time:</label>
+
+            <select id="reservation_hour">
+              <option value="0" disabled>Select time</option>
+            </select>
+          </p>
+          <p>
+            <label for="guests">Number of guests:</label>
+            <select id="guests">
+            </select>
+          </p>
+
+
+          <button type="button" id="button">Reserve</button>
+        </form>
+      </div>
+      <!--End col-->
+
+      <div class="column">
+        <div class="videowrap">
+          <iframe
+            src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d11898.289517452584!2d-87.60853049433447!3d41.79442860243028!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x880e2912ce6f7027%3A0xc0cfb5545d4a37b2!2sHyde%20Park%2C%20Chicago%2C%20IL%2C%20USA!5e0!3m2!1sen!2spt!4v1662384760663!5m2!1sen!2spt"
+            width="600" height="450" style="border:0;" allowfullscreen="" loading="lazy"
+            referrerpolicy="no-referrer-when-downgrade"></iframe>
+        </div>
+      </div>
+      <!--End col-->
+    </div>
+    <!--End row-->
+
+
+
+
+  </article>
+</section>
+
+<script>
+
+  const date = new Date();
+  var currentHour = date.getHours();
+  reservation_date = document.getElementById('reservation_date')
+  reservation_date.value = `${date.getFullYear()}-${(date.getMonth() + 1).toString().padStart(2, "0")}-${date.getDate().toString().padStart(2, "0")}`;
+  var today = `${date.getFullYear()}-${(date.getMonth() + 1).toString().padStart(2, "0")}-${date.getDate().toString().padStart(2, "0")}`;
+
+  getBookings();
+
+  document.getElementById("reservation_date").addEventListener("change", getBookings);
+
+
+
+  function getBookings() {
+
+    const date = document.getElementById('reservation_date').value;
+
+    fetch("{% url 'bookings' %}" + '?date=' + date)
+      .then(r => r.json())
+      .then(data => {
+
+        var reservations = {}
+        max_reservations = data.max_reservations
+        opening_hour = data.opening_hour
+        closing_hour = data.closing_hour
+        max_number_of_guests = data.max_number_of_guests
+
+        for (item of data.reservations_per_hour) {
+          reservations[item.reservation_hour] = item.id__count
+        }
+
+
+        slot_options = '<option value="0" disabled>Select time</option>'
+
+        for (i = opening_hour; i <= closing_hour; i++) {
+          const label = formatTime(i);
+          if (i <= currentHour && reservation_date.value == today) {
+            continue;
+          }
+          if (reservations[i] >= max_reservations) {
+            slot_options += `<option value=${i} disabled>${label}</option>`;
+          } else {
+            slot_options += `<option value=${i}>${label}</option>`;
+          }
+
+        }
+
+        guest_options = '<option value="0" disabled>Select number of guests</option>'
+        guest_options += `<option value=${1}>1 Guest</option>`;
+        for (i = 2; i <= max_number_of_guests; i++) {
+          guest_options += `<option value=${i}>${i} Guests</option>`;
+        }
+        document.getElementById('reservation_hour').innerHTML = slot_options;
+        document.getElementById('guests').innerHTML = guest_options;
+
+      })
+  }
+
+
+  document.getElementById('button').addEventListener('click', function (e) {
+    const firstName = document.getElementById('first_name').value;
+    const phoneNumber = document.getElementById('phone_number').value;
+    const reservationDate = document.getElementById('reservation_date').value;
+    const reservationSlot = document.getElementById('reservation_hour').value;
+    const guests = document.getElementById('guests').value;
+
+
+    // Check if any of the required fields are blank before submitting
+    if (firstName.trim() === '' || reservationDate.trim() === '' || reservationSlot.trim() === '0' || guests.trim() === '') {
+      alert('Please fill in all required fields.');
+      return;
+    }
+    if (guests < 1 || guests > 8) {
+      alert('Please choose 1-8 guests')
+      return;
+    }
+
+
+    const formdata = {
+      first_name: firstName,
+      reservation_date: reservationDate,
+      reservation_hour: reservationSlot,
+      phone_number: phoneNumber,
+      number_of_guests: guests,
+
+    };
+
+    fetch("{% url 'bookings' %}", { method: 'post', body: JSON.stringify(formdata) })
+      .then(r => r.json())
+      .then(data => {
+
+        if (data["success"]) {
+          alert("Reservation was successful")
+          return;
+        }
+        else if (data["error"]) {
+          alert(data["error"])
+          location.reload()
+          return;
+        }
+
+        document.getElementById("form").reset();
+
+      })
+  })
+</script>
+<script src="{% static 'js/datelimiter.js'%}"></script>
+<script src="{% static 'js/formatTime.js'%}"></script>
+<script src="{% static 'js/phoneNumberFormatter.js'%}"></script>
+
+
+{% endblock %}

@@ -1,0 +1,9 @@
+db.sqlite3
+.env
+# Ignore development and IDE-related files
+__pycache__/
+.vscode/
+.idea/
+*.pyc
+*.pyo
+*.pyd
